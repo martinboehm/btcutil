@@ -408,12 +408,15 @@ func TestPublicDerivation(t *testing.T) {
 	// The public extended keys for test vectors in [BIP32].
 	testVec1MasterPubKey := "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8"
 	testVec2MasterPubKey := "xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB"
+	// Groestlcoin test
+	testVec3MasterPubKey := "xpub661MyMwAqRbcFLgDU7wpcEVubSF7NkswwmXBUkDiGUW6uopeUMys4AqKXNgpfZKRTLnpKQgffd6a2c3J8JxLkF1AQN17Pm9QYHEqEdHH2EN"
 
 	tests := []struct {
 		name    string
 		master  string
 		path    []uint32
 		wantPub string
+		hasher  base58.CksumHasher
 	}{
 		// Test vector 1
 		{
@@ -421,36 +424,42 @@ func TestPublicDerivation(t *testing.T) {
 			master:  testVec1MasterPubKey,
 			path:    []uint32{},
 			wantPub: "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 1 chain m/0",
 			master:  testVec1MasterPubKey,
 			path:    []uint32{0},
 			wantPub: "xpub68Gmy5EVb2BdFbj2LpWrk1M7obNuaPTpT5oh9QCCo5sRfqSHVYWex97WpDZzszdzHzxXDAzPLVSwybe4uPYkSk4G3gnrPqqkV9RyNzAcNJ1",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 1 chain m/0/1",
 			master:  testVec1MasterPubKey,
 			path:    []uint32{0, 1},
 			wantPub: "xpub6AvUGrnEpfvJBbfx7sQ89Q8hEMPM65UteqEX4yUbUiES2jHfjexmfJoxCGSwFMZiPBaKQT1RiKWrKfuDV4vpgVs4Xn8PpPTR2i79rwHd4Zr",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 1 chain m/0/1/2",
 			master:  testVec1MasterPubKey,
 			path:    []uint32{0, 1, 2},
 			wantPub: "xpub6BqyndF6rhZqmgktFCBcapkwubGxPqoAZtQaYewJHXVKZcLdnqBVC8N6f6FSHWUghjuTLeubWyQWfJdk2G3tGgvgj3qngo4vLTnnSjAZckv",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 1 chain m/0/1/2/2",
 			master:  testVec1MasterPubKey,
 			path:    []uint32{0, 1, 2, 2},
 			wantPub: "xpub6FHUhLbYYkgFQiFrDiXRfQFXBB2msCxKTsNyAExi6keFxQ8sHfwpogY3p3s1ePSpUqLNYks5T6a3JqpCGszt4kxbyq7tUoFP5c8KWyiDtPp",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 1 chain m/0/1/2/2/1000000000",
 			master:  testVec1MasterPubKey,
 			path:    []uint32{0, 1, 2, 2, 1000000000},
 			wantPub: "xpub6GX3zWVgSgPc5tgjE6ogT9nfwSADD3tdsxpzd7jJoJMqSY12Be6VQEFwDCp6wAQoZsH2iq5nNocHEaVDxBcobPrkZCjYW3QUmoDYzMFBDu9",
+			hasher:  base58.Sha256D,
 		},
 
 		// Test vector 2
@@ -459,42 +468,71 @@ func TestPublicDerivation(t *testing.T) {
 			master:  testVec2MasterPubKey,
 			path:    []uint32{},
 			wantPub: "xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 2 chain m/0",
 			master:  testVec2MasterPubKey,
 			path:    []uint32{0},
 			wantPub: "xpub69H7F5d8KSRgmmdJg2KhpAK8SR3DjMwAdkxj3ZuxV27CprR9LgpeyGmXUbC6wb7ERfvrnKZjXoUmmDznezpbZb7ap6r1D3tgFxHmwMkQTPH",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 2 chain m/0/2147483647",
 			master:  testVec2MasterPubKey,
 			path:    []uint32{0, 2147483647},
 			wantPub: "xpub6ASAVgeWMg4pmutghzHG3BohahjwNwPmy2DgM6W9wGegtPrvNgjBwuZRD7hSDFhYfunq8vDgwG4ah1gVzZysgp3UsKz7VNjCnSUJJ5T4fdD",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 2 chain m/0/2147483647/1",
 			master:  testVec2MasterPubKey,
 			path:    []uint32{0, 2147483647, 1},
 			wantPub: "xpub6CrnV7NzJy4VdgP5niTpqWJiFXMAca6qBm5Hfsry77SQmN1HGYHnjsZSujoHzdxf7ZNK5UVrmDXFPiEW2ecwHGWMFGUxPC9ARipss9rXd4b",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 2 chain m/0/2147483647/1/2147483646",
 			master:  testVec2MasterPubKey,
 			path:    []uint32{0, 2147483647, 1, 2147483646},
 			wantPub: "xpub6FL2423qFaWzHCvBndkN9cbkn5cysiUeFq4eb9t9kE88jcmY63tNuLNRzpHPdAM4dUpLhZ7aUm2cJ5zF7KYonf4jAPfRqTMTRBNkQL3Tfta",
+			hasher:  base58.Sha256D,
 		},
 		{
 			name:    "test vector 2 chain m/0/2147483647/1/2147483646/2",
 			master:  testVec2MasterPubKey,
 			path:    []uint32{0, 2147483647, 1, 2147483646, 2},
 			wantPub: "xpub6H7WkJf547AiSwAbX6xsm8Bmq9M9P1Gjequ5SipsjipWmtXSyp4C3uwzewedGEgAMsDy4jEvNTWtxLyqqHY9C12gaBmgUdk2CGmwachwnWK",
+			hasher:  base58.Sha256D,
+		},
+
+		// Test vector 3 (Groestlcoin)
+		{
+			name:    "test vector 3 chain m",
+			master:  testVec3MasterPubKey,
+			path:    []uint32{},
+			wantPub: testVec3MasterPubKey,
+			hasher:  base58.Groestl512D,
+		},
+		{
+			name:    "test vector 2 chain m/0",
+			master:  testVec3MasterPubKey,
+			path:    []uint32{0},
+			wantPub: "xpub68Zyu13hPwsx8egknnRtfGmk6n9f6S5zbousZUJmQDZsB3GCppTz73oD2WS8DcCa4hqvNePCt8dFt5TKSSBgvCdgg48iWZQ7qgKnFYssEMa",
+			hasher:  base58.Groestl512D,
+		},
+		{
+			name:    "test vector 2 chain m/0/2147483647",
+			master:  testVec3MasterPubKey,
+			path:    []uint32{0, 2147483647},
+			wantPub: "xpub6ALvHVtBofjyjcAG968U1Jpm1qoKVUoHZ6owPAKAVcMa8UmG48p8ThhmfLsdz94za8vrrgwriTRLweteZZcabxuh6vUgUssShwGa73uVYvG",
+			hasher:  base58.Groestl512D,
 		},
 	}
 
 tests:
 	for i, test := range tests {
-		extKey, err := NewKeyFromString(test.master, base58.Sha256D)
+		extKey, err := NewKeyFromString(test.master, test.hasher)
 		if err != nil {
 			t.Errorf("NewKeyFromString #%d (%s): unexpected error "+
 				"creating extended key: %v", i, test.name,
