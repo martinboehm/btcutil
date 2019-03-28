@@ -19,7 +19,6 @@ import (
 	"math/big"
 
 	"github.com/martinboehm/btcd/btcec"
-	"github.com/martinboehm/btcd/chaincfg/chainhash"
 	"github.com/martinboehm/btcutil"
 	"github.com/martinboehm/btcutil/base58"
 	"github.com/martinboehm/btcutil/chaincfg"
@@ -404,8 +403,8 @@ func (k *ExtendedKey) String() string {
 	// The serialized format is:
 	//   version (4) || depth (1) || parent fingerprint (4)) ||
 	//   child num (4) || chain code (32) || key data (33) || checksum (4)
-	serializedBytes := make([]byte, 0, serializedKeyLen+4)
-	serializedBytes = append(serializedBytes, k.version...)
+	serializedBytes := make([]byte, 0, serializedKeyLen)
+	// version will be added during checksum calculation
 	serializedBytes = append(serializedBytes, k.depth)
 	serializedBytes = append(serializedBytes, k.parentFP...)
 	serializedBytes = append(serializedBytes, childNumBytes[:]...)
@@ -416,10 +415,7 @@ func (k *ExtendedKey) String() string {
 	} else {
 		serializedBytes = append(serializedBytes, k.pubKeyBytes()...)
 	}
-
-	checkSum := chainhash.DoubleHashB(serializedBytes)[:4]
-	serializedBytes = append(serializedBytes, checkSum...)
-	return base58.Encode(serializedBytes)
+	return base58.CheckEncode(serializedBytes, k.version, base58.Sha256D)
 }
 
 // IsForNet returns whether or not the extended key is associated with the
@@ -505,23 +501,19 @@ func NewMaster(seed []byte, net *chaincfg.Params) (*ExtendedKey, error) {
 // extended key.
 func NewKeyFromString(key string) (*ExtendedKey, error) {
 	// The base58-decoded extended key must consist of a serialized payload
-	// plus an additional 4 bytes for the checksum.
-	decoded := base58.Decode(key)
-	if len(decoded) != serializedKeyLen+4 {
+	// plus an additional 4 bytes for the checksum. We use 0 as version length
+	// because we want it to be part of the payload.
+	payload, _, err := base58.CheckDecode(key, 0, base58.Sha256D)
+	if err != nil {
+		return nil, ErrBadChecksum
+	}
+	if len(payload) != serializedKeyLen {
 		return nil, ErrInvalidKeyLen
 	}
 
 	// The serialized format is:
 	//   version (4) || depth (1) || parent fingerprint (4)) ||
 	//   child num (4) || chain code (32) || key data (33) || checksum (4)
-
-	// Split the payload and checksum up and ensure the checksum matches.
-	payload := decoded[:len(decoded)-4]
-	checkSum := decoded[len(decoded)-4:]
-	expectedCheckSum := chainhash.DoubleHashB(payload)[:4]
-	if !bytes.Equal(checkSum, expectedCheckSum) {
-		return nil, ErrBadChecksum
-	}
 
 	// Deserialize each of the payload fields.
 	version := payload[:4]

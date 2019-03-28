@@ -854,9 +854,9 @@ func TestErrors(t *testing.T) {
 		neuterErr error
 	}{
 		{
-			name: "invalid key length",
+			name: "invalid key length and bad checksum",
 			key:  "xpub1234",
-			err:  ErrInvalidKeyLen,
+			err:  ErrBadChecksum,
 		},
 		{
 			name: "bad checksum",
