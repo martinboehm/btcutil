@@ -16,6 +16,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/martinboehm/btcutil/base58"
 	"github.com/martinboehm/btcutil/chaincfg"
 )
 
@@ -374,7 +375,7 @@ func TestPrivateDerivation(t *testing.T) {
 
 tests:
 	for i, test := range tests {
-		extKey, err := NewKeyFromString(test.master)
+		extKey, err := NewKeyFromString(test.master, base58.Sha256D)
 		if err != nil {
 			t.Errorf("NewKeyFromString #%d (%s): unexpected error "+
 				"creating extended key: %v", i, test.name,
@@ -493,7 +494,7 @@ func TestPublicDerivation(t *testing.T) {
 
 tests:
 	for i, test := range tests {
-		extKey, err := NewKeyFromString(test.master)
+		extKey, err := NewKeyFromString(test.master, base58.Sha256D)
 		if err != nil {
 			t.Errorf("NewKeyFromString #%d (%s): unexpected error "+
 				"creating extended key: %v", i, test.name,
@@ -591,7 +592,7 @@ func TestExtendedKeyAPI(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		key, err := NewKeyFromString(test.extKey)
+		key, err := NewKeyFromString(test.extKey, base58.Sha256D)
 		if err != nil {
 			t.Errorf("NewKeyFromString #%d (%s): unexpected "+
 				"error: %v", i, test.name, err)
@@ -754,7 +755,7 @@ func TestNet(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		extKey, err := NewKeyFromString(test.key)
+		extKey, err := NewKeyFromString(test.key, base58.Sha256D)
 		if err != nil {
 			t.Errorf("NewKeyFromString #%d (%s): unexpected error "+
 				"creating extended key: %v", i, test.name,
@@ -878,7 +879,7 @@ func TestErrors(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		extKey, err := NewKeyFromString(test.key)
+		extKey, err := NewKeyFromString(test.key, base58.Sha256D)
 		if !reflect.DeepEqual(err, test.err) {
 			t.Errorf("NewKeyFromString #%d (%s): mismatched error "+
 				"-- got: %v, want: %v", i, test.name, err,
@@ -1022,7 +1023,7 @@ func TestZero(t *testing.T) {
 		}
 
 		// Deserialize key and get the neutered version.
-		key, err = NewKeyFromString(test.extKey)
+		key, err = NewKeyFromString(test.extKey, base58.Sha256D)
 		if err != nil {
 			t.Errorf("NewKeyFromString #%d (%s): unexpected "+
 				"error: %v", i, test.name, err)

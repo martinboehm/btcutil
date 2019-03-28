@@ -7,6 +7,7 @@ package hdkeychain_test
 import (
 	"testing"
 
+	"github.com/martinboehm/btcutil/base58"
 	"github.com/martinboehm/btcutil/hdkeychain"
 )
 
@@ -19,7 +20,7 @@ const bip0032MasterPriv1 = "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbP" +
 // child from a master private extended key.
 func BenchmarkDeriveHardened(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1, base58.Sha256D)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}
@@ -34,7 +35,7 @@ func BenchmarkDeriveHardened(b *testing.B) {
 // (non-hardened) child from a master private extended key.
 func BenchmarkDeriveNormal(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1, base58.Sha256D)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}
@@ -49,7 +50,7 @@ func BenchmarkDeriveNormal(b *testing.B) {
 // key to a public extended key.
 func BenchmarkPrivToPub(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1, base58.Sha256D)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}
@@ -64,7 +65,7 @@ func BenchmarkPrivToPub(b *testing.B) {
 // extended key.
 func BenchmarkDeserialize(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+		hdkeychain.NewKeyFromString(bip0032MasterPriv1, base58.Sha256D)
 	}
 }
 
@@ -72,7 +73,7 @@ func BenchmarkDeserialize(b *testing.B) {
 // extended key.
 func BenchmarkSerialize(b *testing.B) {
 	b.StopTimer()
-	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1)
+	masterKey, err := hdkeychain.NewKeyFromString(bip0032MasterPriv1, base58.Sha256D)
 	if err != nil {
 		b.Errorf("Failed to decode master seed: %v", err)
 	}

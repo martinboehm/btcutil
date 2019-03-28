@@ -7,6 +7,7 @@ package hdkeychain_test
 import (
 	"fmt"
 
+	"github.com/martinboehm/btcutil/base58"
 	"github.com/martinboehm/btcutil/chaincfg"
 	"github.com/martinboehm/btcutil/hdkeychain"
 )
@@ -63,7 +64,7 @@ func Example_defaultWalletLayout() {
 	// Start by getting an extended key instance for the master node.
 	// This gives the path:
 	//   m
-	masterKey, err := hdkeychain.NewKeyFromString(master)
+	masterKey, err := hdkeychain.NewKeyFromString(master, base58.Sha256D)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -162,7 +163,7 @@ func Example_audits() {
 	// Start by getting an extended key instance for the master node.
 	// This gives the path:
 	//   m
-	masterKey, err := hdkeychain.NewKeyFromString(master)
+	masterKey, err := hdkeychain.NewKeyFromString(master, base58.Sha256D)
 	if err != nil {
 		fmt.Println(err)
 		return
