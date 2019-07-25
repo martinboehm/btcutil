@@ -19,18 +19,24 @@ var checkEncodingStringTests = []struct {
 }{
 	{[]byte{20}, base58.Sha256D, "", "3MNQE1X"},
 	{[]byte{20}, base58.Groestl512D, "", "3MMSnZL"},
+	{[]byte{20, 0}, base58.Blake256D, "", "Axk2WA6L"},
 	{[]byte{20}, base58.Sha256D, " ", "B2Kr6dBE"},
+	{[]byte{20, 0}, base58.Blake256D, " ", "kxg5DGCa1"},
 	{[]byte{20}, base58.Sha256D, "-", "B3jv1Aft"},
 	{[]byte{20}, base58.Sha256D, "0", "B482yuaX"},
 	{[]byte{20}, base58.Sha256D, "1", "B4CmeGAC"},
 	{[]byte{20}, base58.Sha256D, "-1", "mM7eUf6kB"},
+	{[]byte{20, 0}, base58.Blake256D, "-1", "4M2qnQVfVwu"},
 	{[]byte{20}, base58.Sha256D, "11", "mP7BMTDVH"},
 	{[]byte{20}, base58.Sha256D, "abc", "4QiVtDjUdeq"},
 	{[]byte{20}, base58.Sha256D, "1234598760", "ZmNb8uQn5zvnUohNCEPP"},
 	{[]byte{20}, base58.Groestl512D, "1234598760", "ZmNb8uQn5zvnUoisWKK7"},
+	{[]byte{20, 0}, base58.Blake256D, "1234598760", "3UFLKR4oYrL1hSX1Eu2W3F"},
 	{[]byte{20}, base58.Sha256D, "abcdefghijklmnopqrstuvwxyz", "K2RYDcKfupxwXdWhSAxQPCeiULntKm63UXyx5MvEH2"},
 	{[]byte{20}, base58.Groestl512D, "abcdefghijklmnopqrstuvwxyz", "K2RYDcKfupxwXdWhSAxQPCeiULntKm63UXyx2rTuoo"},
+	{[]byte{20, 0}, base58.Blake256D, "abcdefghijklmnopqrstuvwxyz", "2M5VSfthNqvveeGWTcKRgY4Rm258o4ZDKBZGkAQ799jp"},
 	{[]byte{20}, base58.Sha256D, "00000000000000000000000000000000000000000000000000000000000000", "bi1EWXwJay2udZVxLJozuTb8Meg4W9c6xnmJaRDjg6pri5MBAxb9XwrpQXbtnqEoRV5U2pixnFfwyXC8tRAVC8XxnjK"},
+	{[]byte{20, 0}, base58.Blake256D, "00000000000000000000000000000000000000000000000000000000000000", "3cmTs9hNQGCVmurJUgS7UokKFYZCCJWvWfYRBCaox5hXDn3Giiy1u9AEKn7vLS8K87BcDr6Ckr4JYRnnaSMRDsB49i3eU"},
 }
 
 func TestBase58Check(t *testing.T) {
@@ -41,7 +47,7 @@ func TestBase58Check(t *testing.T) {
 		}
 
 		// test decoding
-		res, version, err := base58.CheckDecode(test.out, 1, test.hasher)
+		res, version, err := base58.CheckDecode(test.out, uint8(len(test.version)), test.hasher)
 		if err != nil {
 			t.Errorf("CheckDecode test #%d failed with err: %v", x, err)
 		} else if !bytes.Equal(version, test.version) {

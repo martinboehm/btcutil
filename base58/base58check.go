@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"github.com/Groestlcoin/go-groestl-hash/groestl"
+	"github.com/dchest/blake256"
 )
 
 type CksumHasher int
@@ -16,6 +17,7 @@ type CksumHasher int
 const (
 	Sha256D     CksumHasher = iota // Double SHA256
 	Groestl512D                    // Double Groestl512
+	Blake256D                      // Double Blake256
 )
 
 // ErrChecksum indicates that the checksum of a check-encoded string does not verify against
@@ -40,6 +42,14 @@ func checksum(input []byte, hash CksumHasher) (cksum [4]byte) {
 		g.Write(h1[:])
 		g.Close(h2[:], 0, 0)
 		copy(cksum[:], h2[:4])
+	case Blake256D:
+		h := blake256.New()
+		h.Write(input)
+		intermediateHash := h.Sum(nil)
+		h.Reset()
+		h.Write(intermediateHash)
+		finalHash := h.Sum(nil)
+		copy(cksum[:], finalHash)
 	default:
 		// Should never happen
 		panic("BUG! Not all CksumHasher values are implemented.")
