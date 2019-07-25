@@ -410,6 +410,9 @@ func TestPublicDerivation(t *testing.T) {
 	testVec2MasterPubKey := "xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB"
 	// Groestlcoin test
 	testVec3MasterPubKey := "xpub661MyMwAqRbcFLgDU7wpcEVubSF7NkswwmXBUkDiGUW6uopeUMys4AqKXNgpfZKRTLnpKQgffd6a2c3J8JxLkF1AQN17Pm9QYHEqEdHH2EN"
+	// Decred test
+	testVec4MasterPubKey := "dpubZF8BRmciAzYoTjXZ3bbRWLVCwUKtTquact3Tr6ye77Rgmw76VyqMb9TB9KpfrvUYEM5d1Au4fQzE2BbtxRjwzGsqnWHmtQP9UV1kxZaqvb6"
+	testVec5MasterPubKey := "dpubZF4LSCdF9YKZfNzTVYhz4RBxsjYXqms8AQnMBHXZ8GUKoRSigG7kQnKiJt5pzk93Q8FxcdVBEkQZruSXduGtWnkwXzGnjbSovQ97dCxqaXc"
 
 	tests := []struct {
 		name    string
@@ -527,6 +530,94 @@ func TestPublicDerivation(t *testing.T) {
 			path:    []uint32{0, 2147483647},
 			wantPub: "xpub6ALvHVtBofjyjcAG968U1Jpm1qoKVUoHZ6owPAKAVcMa8UmG48p8ThhmfLsdz94za8vrrgwriTRLweteZZcabxuh6vUgUssShwGa73uVYvG",
 			hasher:  base58.Groestl512D,
+		},
+
+		// Test vector 4 (Decred)
+		{
+			name:    "test vector 1 chain m",
+			master:  testVec4MasterPubKey,
+			path:    []uint32{},
+			wantPub: "dpubZF8BRmciAzYoTjXZ3bbRWLVCwUKtTquact3Tr6ye77Rgmw76VyqMb9TB9KpfrvUYEM5d1Au4fQzE2BbtxRjwzGsqnWHmtQP9UV1kxZaqvb6",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 1 chain m/0",
+			master:  testVec4MasterPubKey,
+			path:    []uint32{0},
+			wantPub: "dpubZHm6cmVU9pvfDCe3BY7iESzsEnV6xfi4DfoYvycnWLM9cryzKA84DqJ2CphYq6cfiEXgo9C3YLJA4ou81mavw9NDtNc3bLCWVqJz8Fx8qxB",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 1 chain m/0/1",
+			master:  testVec4MasterPubKey,
+			path:    []uint32{0, 1},
+			wantPub: "dpubZKtA6UTDuxeXV2PcYqoe68u7cgDhbTNbA4dUJoaAvfWzuCcRQCyG5S6dbpDZb2p3B5Y2XxLtD94Nemc8QRV4RspmvGwHvE2FZsfE5Pqpeor",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 1 chain m/0/1/2",
+			master:  testVec4MasterPubKey,
+			path:    []uint32{0, 1, 2},
+			wantPub: "dpubZMwLXm5dRVEJRvJHU8gNV7RwHeXMRRUnYFD4f6C8uNFfqksD1FCDARTwNPsQB3Pg4LuoKXkZbPnE6woUyedwNYVPvZToT5x4Kt6rs4GKa9c",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 1 chain m/0/1/2/2",
+			master:  testVec4MasterPubKey,
+			path:    []uint32{0, 1, 2, 2},
+			wantPub: "dpubZPfASfojwk6MhtAtkM6wPdQBr1ycVjoyqs3N51zR1keK6FcBhjBTtdW3Wn3kDLBZqgLnGozu8Gh3FV8GrFGpu3knmGVoF1Z6yGdqLU1Rz1S",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 1 chain m/0/1/2/2/1000000000",
+			master:  testVec4MasterPubKey,
+			path:    []uint32{0, 1, 2, 2, 1000000000},
+			wantPub: "dpubZR5Pf8cbUGikESevygwydenBaTsgcvoYnRSi7tygu23PxmVEG4GeMQj54oHFoPyRdt7Pg4sMad56yprQszbNyZVewaNEhDkn112C3mqB1fd",
+			hasher:  base58.Blake256D,
+		},
+
+		// Test vector 5 (Decred)
+		{
+			name:    "test vector 2 chain m",
+			master:  testVec5MasterPubKey,
+			path:    []uint32{},
+			wantPub: "dpubZF4LSCdF9YKZfNzTVYhz4RBxsjYXqms8AQnMBHXZ8GUKoRSigG7kQnKiJt5pzk93Q8FxcdVBEkQZruSXduGtWnkwXzGnjbSovQ97dCxqaXc",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 2 chain m/0",
+			master:  testVec5MasterPubKey,
+			path:    []uint32{0},
+			wantPub: "dpubZHJs2Z3PtHbbpaXQCi5wBKPhU8tC5ztBKUYBCYNGKk8eZ1EmBs3MhnLJbxHFMAahGnDnZT7qZxC7AXKP8PB6BDNUZgkG77moNMRmXyQ6s6s",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 2 chain m/0/2147483647",
+			master:  testVec5MasterPubKey,
+			path:    []uint32{0, 2147483647},
+			wantPub: "dpubZJgFEUcAZawGaLZdFEX6FfQBQVgU4bUC5qvDERUTD5dfcB2AQPnJ1dKp1R2DrAzC36BznZG43317s2oBJv3PuaZmA6HqmwMu6vNna4Gfumf",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 2 chain m/0/2147483647/1",
+			master:  testVec5MasterPubKey,
+			path:    []uint32{0, 2147483647, 1},
+			wantPub: "dpubZLbgtFNyjt3k2cJtg4a3dD2iXPKFTLgNKP8rLC1p5UE3AyfRHLTcYrZ6brg8eUmGvKRrXZ7A3XyVfwGxvYtjfz8514dUoJPkmSnBmC6qQK6",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 2 chain m/0/2147483647/1/2147483646",
+			master:  testVec5MasterPubKey,
+			path:    []uint32{0, 2147483647, 1, 2147483646},
+			wantPub: "dpubZNyWTupEG35S6d4uN93vWXpGxQuxtW9zuThQbnWpWTHwRCzxREqSSc9eDYivRGiZnEkEhPece5ciSoHtW6Khc729f6eAxjPnBgU38U9hgYw",
+			hasher:  base58.Blake256D,
+		},
+		{
+			name:    "test vector 2 chain m/0/2147483647/1/2147483646/2",
+			master:  testVec5MasterPubKey,
+			path:    []uint32{0, 2147483647, 1, 2147483646, 2},
+			wantPub: "dpubZRuRErXqhdJaZWD1AzXB6d5w2zw7UZ7ALxiS1gHbnQbVEohBzQzsVwGRzq97pmuE7ToA6DGn2QTH4DexxzdnMvkiYUpk8Nh2KEuYUM2RCeU",
+			hasher:  base58.Blake256D,
 		},
 	}
 

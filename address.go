@@ -324,7 +324,13 @@ type AddressScriptHash struct {
 
 // NewAddressScriptHash returns a new AddressScriptHash.
 func NewAddressScriptHash(serializedScript []byte, net *chaincfg.Params) (*AddressScriptHash, error) {
-	scriptHash := Hash160(serializedScript)
+	var scriptHash []byte
+	switch net.Base58CksumHasher {
+	case base58.Blake256D:
+		scriptHash = BlakeHash160(serializedScript)
+	default:
+		scriptHash = Hash160(serializedScript)
+	}
 	return newAddressScriptHashFromHash(scriptHash, net.ScriptHashAddrID, net.Base58CksumHasher)
 }
 
