@@ -33,6 +33,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/dchest/blake256"
+  packages = ["blake256"]
+  revision = "dee3fe6eb0e98dc774a94fc231f85baf7c29d360"
+
+[[projects]]
+  branch = "master"
   name = "github.com/kkdai/bstream"
   packages = ["."]
   revision = "f71540b9dfdcfe64dbf2818e9b66423c6aafcacd"
