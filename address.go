@@ -474,7 +474,14 @@ func (a *AddressPubKey) serialize() []byte {
 //
 // Part of the Address interface.
 func (a *AddressPubKey) EncodeAddress() string {
-	return encodeAddress(Hash160(a.serialize()), a.pubKeyHashID, a.cksumHasher)
+	var hash []byte
+	switch a.cksumHasher {
+	case base58.Blake256D:
+		hash = BlakeHash160(a.serialize())
+	default:
+		hash = Hash160(a.serialize())
+	}
+	return encodeAddress(hash, a.pubKeyHashID, a.cksumHasher)
 }
 
 // ScriptAddress returns the bytes to be included in a txout script to pay
@@ -515,8 +522,19 @@ func (a *AddressPubKey) SetFormat(pkFormat PubKeyFormat) {
 // differs with the format.  At the time of this writing, most Bitcoin addresses
 // are pay-to-pubkey-hash constructed from the uncompressed public key.
 func (a *AddressPubKey) AddressPubKeyHash() *AddressPubKeyHash {
-	addr := &AddressPubKeyHash{netID: a.pubKeyHashID}
-	copy(addr.hash[:], Hash160(a.serialize()))
+	addr := &AddressPubKeyHash{
+		netID:       a.pubKeyHashID,
+		cksumHasher: a.cksumHasher,
+	}
+
+	var hash []byte
+	switch a.cksumHasher {
+	case base58.Blake256D:
+		hash = BlakeHash160(a.serialize())
+	default:
+		hash = Hash160(a.serialize())
+	}
+	copy(addr.hash[:], hash)
 	return addr
 }
 
