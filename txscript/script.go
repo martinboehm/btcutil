@@ -13,6 +13,7 @@ import (
 	"github.com/martinboehm/btcd/chaincfg/chainhash"
 	"github.com/martinboehm/btcd/wire"
 	"github.com/martinboehm/btcutil"
+	"github.com/martinboehm/btcutil/base58"
 )
 
 // Bip16Activation is the timestamp where BIP0016 is valid to use in the
@@ -865,15 +866,22 @@ func IsUnspendable(pkScript []byte) bool {
 // As P2PK and P2PKH have equal addresses, the P2PK script must be converted to P2PKH
 // so that the application finds all transactions made by given private key
 // if the script is not P2PK, it is returned unchanged
-func ConvertP2PKtoP2PKH(script []byte) ([]byte, error) {
+func ConvertP2PKtoP2PKH(cksumHasher base58.CksumHasher, script []byte) ([]byte, error) {
 	// len of P2PK is 35 or 67 bytes
 	// compressed P2PK  - 0x21 PK len, 33 bytes PK, 0xac OP_CHECKSIG
 	// uncompressed/hybrid P2PK - PK 0x41 len, 65 bytes PK, 0xac OP_CHECKSIG
 	l := len(script)
 	if l == 35 || l == 67 {
-		if script[l-1] == OP_CHECKSIG && (script[0] == 0x21 || script[0] == 0x41) {
+		if script[l-1] == OP_CHECKSIG && (script[0] == OP_DATA_33 || script[0] == OP_DATA_65) {
 			// compute hash from the public key in the input format
-			return payToPubKeyHashScript(btcutil.Hash160(script[1 : l-1]))
+			var hash []byte
+			switch cksumHasher {
+			case base58.Blake256D:
+				hash = btcutil.BlakeHash160(script[1 : l-1])
+			default:
+				hash = btcutil.Hash160(script[1 : l-1])
+			}
+			return payToPubKeyHashScript(hash)
 		}
 	}
 	return script, nil
