@@ -874,13 +874,8 @@ func ConvertP2PKtoP2PKH(cksumHasher base58.CksumHasher, script []byte) ([]byte, 
 	if l == 35 || l == 67 {
 		if script[l-1] == OP_CHECKSIG && (script[0] == OP_DATA_33 || script[0] == OP_DATA_65) {
 			// compute hash from the public key in the input format
-			var hash []byte
-			switch cksumHasher {
-			case base58.Blake256D:
-				hash = btcutil.BlakeHash160(script[1 : l-1])
-			default:
-				hash = btcutil.Hash160(script[1 : l-1])
-			}
+			pubKey := script[1 : l-1]
+			hash := btcutil.CksumHashGen(cksumHasher, pubKey)
 			return payToPubKeyHashScript(hash)
 		}
 	}

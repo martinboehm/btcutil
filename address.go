@@ -324,13 +324,7 @@ type AddressScriptHash struct {
 
 // NewAddressScriptHash returns a new AddressScriptHash.
 func NewAddressScriptHash(serializedScript []byte, net *chaincfg.Params) (*AddressScriptHash, error) {
-	var scriptHash []byte
-	switch net.Base58CksumHasher {
-	case base58.Blake256D:
-		scriptHash = BlakeHash160(serializedScript)
-	default:
-		scriptHash = Hash160(serializedScript)
-	}
+	scriptHash := CksumHashGen(net.Base58CksumHasher, serializedScript)
 	return newAddressScriptHashFromHash(scriptHash, net.ScriptHashAddrID, net.Base58CksumHasher)
 }
 
@@ -474,13 +468,7 @@ func (a *AddressPubKey) serialize() []byte {
 //
 // Part of the Address interface.
 func (a *AddressPubKey) EncodeAddress() string {
-	var hash []byte
-	switch a.cksumHasher {
-	case base58.Blake256D:
-		hash = BlakeHash160(a.serialize())
-	default:
-		hash = Hash160(a.serialize())
-	}
+	hash := CksumHashGen(a.cksumHasher, a.serialize())
 	return encodeAddress(hash, a.pubKeyHashID, a.cksumHasher)
 }
 
@@ -527,13 +515,7 @@ func (a *AddressPubKey) AddressPubKeyHash() *AddressPubKeyHash {
 		cksumHasher: a.cksumHasher,
 	}
 
-	var hash []byte
-	switch a.cksumHasher {
-	case base58.Blake256D:
-		hash = BlakeHash160(a.serialize())
-	default:
-		hash = Hash160(a.serialize())
-	}
+	hash := CksumHashGen(a.cksumHasher, a.serialize())
 	copy(addr.hash[:], hash)
 	return addr
 }

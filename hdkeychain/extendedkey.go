@@ -325,13 +325,7 @@ func (k *ExtendedKey) Child(i uint32) (*ExtendedKey, error) {
 
 	// The fingerprint of the parent for the derived child is the first 4
 	// bytes of the RIPEMD160(SHA256(parentPubKey)).
-	var parentFP []byte
-	switch k.cksumHasher {
-	case base58.Blake256D:
-		parentFP = btcutil.BlakeHash160(k.pubKeyBytes())[:4]
-	default:
-		parentFP = btcutil.Hash160(k.pubKeyBytes())[:4]
-	}
+	parentFP := btcutil.CksumHashGen(k.cksumHasher, k.pubKeyBytes())[:4]
 	return NewExtendedKey(k.version, childKey, childChainCode, parentFP,
 		k.depth+1, i, isPrivate, k.cksumHasher), nil
 }
@@ -385,13 +379,7 @@ func (k *ExtendedKey) ECPrivKey() (*btcec.PrivateKey, error) {
 // Address converts the extended key to a standard bitcoin pay-to-pubkey-hash
 // address for the passed network.
 func (k *ExtendedKey) Address(net *chaincfg.Params) (*btcutil.AddressPubKeyHash, error) {
-	var pkHash []byte
-	switch k.cksumHasher {
-	case base58.Blake256D:
-		pkHash = btcutil.BlakeHash160(k.pubKeyBytes())
-	default:
-		pkHash = btcutil.Hash160(k.pubKeyBytes())
-	}
+	pkHash := btcutil.CksumHashGen(k.cksumHasher, k.pubKeyBytes())
 	return btcutil.NewAddressPubKeyHash(pkHash, net)
 }
 
