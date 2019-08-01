@@ -8,8 +8,8 @@ import (
 	"crypto/sha256"
 	"hash"
 
-	"golang.org/x/crypto/ripemd160"
 	"github.com/dchest/blake256"
+	"golang.org/x/crypto/ripemd160"
 )
 
 // Calculate the hash of hasher over buf.
@@ -25,4 +25,15 @@ func Hash160(buf []byte) []byte {
 
 func BlakeHash160(buf []byte) []byte {
 	return calcHash(calcHash(buf, blake256.New()), ripemd160.New())
+}
+
+// CksumHashGen computes the hash from the passed script based on
+// the passed hasher.
+func CksumHashGen(cksumHasher base58.CksumHasher, script []byte) []byte {
+	switch cksumHasher {
+	case base58.Blake256D:
+		return BlakeHash160(script)
+	default:
+		return Hash160(script)
+	}
 }
