@@ -9,6 +9,7 @@ import (
 	"hash"
 
 	"github.com/dchest/blake256"
+	"github.com/martinboehm/btcutil/base58"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -23,6 +24,7 @@ func Hash160(buf []byte) []byte {
 	return calcHash(calcHash(buf, sha256.New()), ripemd160.New())
 }
 
+// BlakeHash160 calculates the hash ripemd160(blake256(b)).
 func BlakeHash160(buf []byte) []byte {
 	return calcHash(calcHash(buf, blake256.New()), ripemd160.New())
 }
