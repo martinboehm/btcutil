@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/martinboehm/btcd/wire"
 	"reflect"
 	"strings"
 	"testing"
@@ -16,6 +17,33 @@ import (
 	"github.com/martinboehm/btcutil/chaincfg"
 	"golang.org/x/crypto/ripemd160"
 )
+
+type CustomParamStruct struct {
+	Net              wire.BitcoinNet
+	PubKeyHashAddrID byte
+	ScriptHashAddrID byte
+	Bech32HRPSegwit  string
+}
+
+var LitecoinParams = CustomParamStruct{
+	Net:              wire.BitcoinNet(01),
+	PubKeyHashAddrID: 0x30, // starts with L
+	ScriptHashAddrID: 0x32, // starts with M
+	Bech32HRPSegwit:  "ltc",
+}
+
+// We use this function to be able to test functionality in DecodeAddress for
+// defaultNet addresses
+func applyCustomParams(params chaincfg.Params, newParams CustomParamStruct) chaincfg.Params {
+	params.Net = newParams.Net
+	params.PubKeyHashAddrID = []byte{newParams.PubKeyHashAddrID}
+	params.ScriptHashAddrID = []byte{newParams.ScriptHashAddrID}
+	params.Bech32HRPSegwit = newParams.Bech32HRPSegwit
+	chaincfg.Register(&params)
+	return params
+}
+
+var customParams = applyCustomParams(chaincfg.MainNetParams, LitecoinParams)
 
 func TestAddresses(t *testing.T) {
 	chaincfg.RegisterBitcoinParams()
@@ -84,6 +112,42 @@ func TestAddresses(t *testing.T) {
 				return btcutil.NewAddressPubKeyHash(pkHash, &chaincfg.TestNet3Params)
 			},
 			net: &chaincfg.TestNet3Params,
+		},
+		{
+			name:    "litecoin mainnet p2pkh",
+			addr:    "LM2WMpR1Rp6j3Sa59cMXMs1SPzj9eXpGc1",
+			encoded: "LM2WMpR1Rp6j3Sa59cMXMs1SPzj9eXpGc1",
+			valid:   true,
+			result: btcutil.TstAddressPubKeyHash(
+				[ripemd160.Size]byte{
+					0x13, 0xc6, 0x0d, 0x8e, 0x68, 0xd7, 0x34, 0x9f, 0x5b, 0x4c,
+					0xa3, 0x62, 0xc3, 0x95, 0x4b, 0x15, 0x04, 0x50, 0x61, 0xb1},
+				[]byte{LitecoinParams.PubKeyHashAddrID}),
+			f: func() (btcutil.Address, error) {
+				pkHash := []byte{
+					0x13, 0xc6, 0x0d, 0x8e, 0x68, 0xd7, 0x34, 0x9f, 0x5b, 0x4c,
+					0xa3, 0x62, 0xc3, 0x95, 0x4b, 0x15, 0x04, 0x50, 0x61, 0xb1}
+				return btcutil.NewAddressPubKeyHash(pkHash, &customParams)
+			},
+			net: &customParams,
+		},
+		{
+			name:    "litecoin p2pkh with ltc1 prefix",
+			addr:    "LTC1eqUzePT9uvpvb413Ejd6P8Cx1Ei8Di",
+			encoded: "LTC1eqUzePT9uvpvb413Ejd6P8Cx1Ei8Di",
+			valid:   true,
+			result: btcutil.TstAddressPubKeyHash(
+				[ripemd160.Size]byte{
+					0x57, 0x63, 0x01, 0x15, 0x30, 0x0a, 0x62, 0x5f, 0x5d, 0xea,
+					0xab, 0x64, 0x10, 0x0f, 0xaa, 0x55, 0x06, 0xc1, 0x42, 0x2f},
+				[]byte{LitecoinParams.PubKeyHashAddrID}),
+			f: func() (btcutil.Address, error) {
+				pkHash := []byte{
+					0x57, 0x63, 0x01, 0x15, 0x30, 0x0a, 0x62, 0x5f, 0x5d, 0xea,
+					0xab, 0x64, 0x10, 0x0f, 0xaa, 0x55, 0x06, 0xc1, 0x42, 0x2f}
+				return btcutil.NewAddressPubKeyHash(pkHash, &customParams)
+			},
+			net: &customParams,
 		},
 
 		// Negative P2PKH tests.
@@ -575,6 +639,25 @@ func TestAddresses(t *testing.T) {
 				return btcutil.NewAddressWitnessScriptHash(scriptHash, &chaincfg.TestNet3Params)
 			},
 			net: &chaincfg.TestNet3Params,
+		},
+		{
+			name:    "litecoin p2wpkh v0",
+			addr:    "ltc1qt6nzjwaqp3nknu5h6xmh58679cjsyqj4gzf8w2",
+			encoded: "ltc1qt6nzjwaqp3nknu5h6xmh58679cjsyqj4gzf8w2",
+			valid:   true,
+			result: btcutil.TstAddressWitnessPubKeyHash(
+				0,
+				[20]byte{
+					0x5e, 0xa6, 0x29, 0x3b, 0xa0, 0x0c, 0x67, 0x69, 0xf2, 0x97,
+					0xd1, 0xb7, 0x7a, 0x1f, 0x5e, 0x2e, 0x25, 0x02, 0x02, 0x55},
+				customParams.Bech32HRPSegwit),
+			f: func() (btcutil.Address, error) {
+				pkHash := []byte{
+					0x5e, 0xa6, 0x29, 0x3b, 0xa0, 0x0c, 0x67, 0x69, 0xf2, 0x97,
+					0xd1, 0xb7, 0x7a, 0x1f, 0x5e, 0x2e, 0x25, 0x02, 0x02, 0x55}
+				return btcutil.NewAddressWitnessPubKeyHash(pkHash, &customParams)
+			},
+			net: &customParams,
 		},
 		// Unsupported witness versions (version 0 only supported at this point)
 		{
